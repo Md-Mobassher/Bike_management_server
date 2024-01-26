@@ -1,20 +1,21 @@
 import express, { NextFunction, Request, Response } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
-import { UserValidation } from './user.validation';
-import { UserControllers } from './user.controller';
 import { upload } from '../../utils/sendImageToCloudinary';
+import { BikeVAlidation } from './bike.validation';
+import { BikeControllers } from './bike.controller';
 
 const router = express.Router();
 
 router.post(
-  '/register',
+  '/add-Bike',
   upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
     req.body = JSON.parse(req.body.data);
     next();
   },
-  validateRequest(UserValidation.createUserValidationSchema),
-  UserControllers.createUser,
+  validateRequest(BikeVAlidation.createBikeValidationSchema),
+  BikeControllers.addBike,
 );
 
-export const UserRoutes = router;
+export const BikeRoutes = router;
