@@ -6,7 +6,6 @@ import { RequestHandler } from 'express';
 
 const addBike = catchAsync(async (req, res) => {
   const { ...bikeData } = req.body;
-  console.log('=>', req.body);
   const result = await BikeServices.addBikeIntoDB(req.file, bikeData);
 
   sendResponse(res, {

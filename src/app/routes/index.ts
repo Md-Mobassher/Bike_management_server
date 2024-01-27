@@ -23,6 +23,10 @@ const moduleRoutes = [
     path: '/sell',
     route: SalesRoutes,
   },
+  {
+    path: '/sales-history',
+    route: SalesRoutes,
+  },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

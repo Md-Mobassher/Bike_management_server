@@ -64,7 +64,6 @@ const getSingleBikeFromDB = async (id: string) => {
 
 const updateBikeIntoDB = async (id: string, payload: Partial<TBike>) => {
   const { ...updateBikeData } = payload;
-  console.log(payload);
 
   const modifiedUpdatedData: Record<string, unknown> = {
     ...updateBikeData,

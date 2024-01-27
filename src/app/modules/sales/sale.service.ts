@@ -6,7 +6,7 @@ import { Bike } from '../bike/bike.model';
 import { Sale } from './sale.model';
 import mongoose from 'mongoose';
 
-const sellBike = async (payload: TSaleBike) => {
+const sellBikeFromDb = async (payload: TSaleBike) => {
   const { bikeId, quantity } = payload;
 
   const session = await mongoose.startSession();
@@ -52,6 +52,38 @@ const sellBike = async (payload: TSaleBike) => {
   }
 };
 
+const getSalesHistory = async (payload: string) => {
+  let startDate: Date;
+
+  switch (payload) {
+    case 'weekly':
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 7);
+      break;
+    case 'daily':
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 1);
+      break;
+    case 'monthly':
+      startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 1);
+      break;
+    case 'yearly':
+      startDate = new Date();
+      startDate.setFullYear(startDate.getFullYear() - 1);
+      break;
+    default:
+      throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
+      return;
+  }
+
+  const salesHistory = await Sale.find({ date: { $gte: startDate } })
+    .select('date quantity')
+    .sort({ date: 'asc' });
+
+  return salesHistory;
+};
 export const SalesServices = {
-  sellBike,
+  sellBikeFromDb,
+  getSalesHistory,
 };

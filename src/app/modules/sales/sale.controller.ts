@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { SalesServices } from './sale.service';
 
 const sellBike = catchAsync(async (req, res) => {
-  const result = await SalesServices.sellBike(req.body);
+  const result = await SalesServices.sellBikeFromDb(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -14,6 +14,19 @@ const sellBike = catchAsync(async (req, res) => {
   });
 });
 
+const salesHistory = catchAsync(async (req, res) => {
+  const { interval } = req.params;
+  const result = await SalesServices.getSalesHistory(interval);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Sales history retrived successfully!',
+    data: result,
+  });
+});
+
 export const SalesControllers = {
   sellBike,
+  salesHistory,
 };
