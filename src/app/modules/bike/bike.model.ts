@@ -12,6 +12,17 @@ const bikeSchema = new Schema<TBike>({
   size: { type: String, required: true },
   color: { type: String, required: true },
   bikeImage: { type: String, required: true },
+  isDeleted: { type: Boolean, default: false, select: 0 },
+});
+
+bikeSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+bikeSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
 });
 
 export const Bike = model<TBike>('Bike', bikeSchema);

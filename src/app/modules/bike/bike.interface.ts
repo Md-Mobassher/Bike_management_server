@@ -9,4 +9,5 @@ export type TBike = {
   size: string;
   color: string;
   bikeImage: string;
+  isDeleted?: boolean;
 };
