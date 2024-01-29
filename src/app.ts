@@ -8,7 +8,15 @@ const app: Application = express();
 
 // parsers
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(
+  cors({
+    origin: [
+      'http://localhost:5173',
+      'https://bike-management-server.vercel.app',
+    ],
+    credentials: true,
+  }),
+);
 
 // application routes
 app.use('/api/v1', router);
