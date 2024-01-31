@@ -77,30 +77,17 @@ const updateBikeIntoDB = async (id: string, payload: Partial<TBike>) => {
 };
 
 const deleteBikeFromDB = async (id: string) => {
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-    const deletedBike = await Bike.findByIdAndUpdate(
-      id,
-      { isDeleted: true },
-      { new: true, session },
-    );
-
-    if (!deletedBike) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Bike');
-    }
-
-    await session.commitTransaction();
-    await session.endSession();
-
-    return deletedBike;
-  } catch (err) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw new Error('Failed to delete Bike');
-  }
+  await Bike.findByIdAndUpdate(
+    id,
+    {
+      isDeleted: true,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return null;
 };
 
 export const BikeServices = {

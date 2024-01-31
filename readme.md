@@ -40,7 +40,7 @@
 
 ## Delete a Bike:
 
-- Method: PATCH
+- Method: PUT
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/:bikeId
 
 ## Sell a bike:
