@@ -43,7 +43,6 @@ const sellBikeFromDb = async (payload: TSaleBike) => {
 
     await session.commitTransaction();
     await session.endSession();
-
     return sale;
   } catch (err: any) {
     await session.abortTransaction();

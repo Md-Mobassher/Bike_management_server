@@ -10,10 +10,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'https://bike-management-server.vercel.app',
-    ],
+    origin: ['http://localhost:5173', '*'],
     credentials: true,
   }),
 );

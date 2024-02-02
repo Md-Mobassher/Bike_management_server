@@ -11,7 +11,7 @@ export interface TUser {
   dateOfBirth?: Date;
   presentAddress: string;
   permanentAddress: string;
-  profileImg: string;
+  profileImg?: string;
   role: 'user' | 'admin';
   isDeleted: boolean;
 }

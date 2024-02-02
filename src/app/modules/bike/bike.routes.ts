@@ -3,13 +3,13 @@ import validateRequest from '../../middlewares/validateRequest';
 import { upload } from '../../utils/sendImageToCloudinary';
 import { BikeVAlidation } from './bike.validation';
 import { BikeControllers } from './bike.controller';
-import auth from '../../middlewares/auth';
+// import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
 router.post(
   '/',
-  auth('user'),
+  // auth('user'),
   upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
