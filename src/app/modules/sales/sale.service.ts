@@ -52,36 +52,44 @@ const sellBikeFromDb = async (payload: TSaleBike) => {
 };
 
 const getSalesHistory = async (payload: string) => {
-  let startDate: Date;
+  try {
+    let startDate: Date;
 
-  switch (payload) {
-    case 'weekly':
-      startDate = new Date();
-      startDate.setDate(startDate.getDate() - 7);
-      break;
-    case 'daily':
-      startDate = new Date();
-      startDate.setDate(startDate.getDate() - 1);
-      break;
-    case 'monthly':
-      startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - 1);
-      break;
-    case 'yearly':
-      startDate = new Date();
-      startDate.setFullYear(startDate.getFullYear() - 1);
-      break;
-    default:
-      throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
-      return;
+    switch (payload) {
+      case 'daily':
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 1);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'weekly':
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - 7);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'monthly':
+        startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 1);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case 'yearly':
+        startDate = new Date();
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      default:
+        throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
+    }
+
+    const salesHistory = await Sale.find({
+      salesDate: { $gte: startDate },
+    }).sort('-salesDate');
+
+    return salesHistory;
+  } catch (error) {
+    throw new AppError(httpStatus.NOT_FOUND, `${error}`);
   }
-
-  const salesHistory = await Sale.find({ date: { $gte: startDate } })
-    .select('date quantity')
-    .sort({ date: 'asc' });
-
-  return salesHistory;
 };
+
 export const SalesServices = {
   sellBikeFromDb,
   getSalesHistory,
