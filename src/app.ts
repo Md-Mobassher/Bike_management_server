@@ -14,6 +14,7 @@ app.use(
       'http://localhost:5173',
       'https://bike-management-client-alpha.vercel.app',
       'https://bike-management-client-dxtais6u6-md-mobassher.vercel.app',
+      '*',
     ],
     credentials: true,
   }),
