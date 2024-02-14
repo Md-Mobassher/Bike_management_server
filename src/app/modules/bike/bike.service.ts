@@ -94,7 +94,7 @@ const bulkDeleteBikesFromDB = async (payload: { bikeIds: string[] }) => {
 };
 
 const deleteBikeFromDB = async (id: string) => {
-  await Bike.findByIdAndUpdate(
+  const result = await Bike.findByIdAndUpdate(
     id,
     {
       isDeleted: true,
@@ -104,7 +104,7 @@ const deleteBikeFromDB = async (id: string) => {
       runValidators: true,
     },
   );
-  return null;
+  return result;
 };
 
 export const BikeServices = {

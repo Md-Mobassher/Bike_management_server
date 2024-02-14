@@ -5,8 +5,9 @@ import { TSaleBike } from './sale.interface';
 import { Bike } from '../bike/bike.model';
 import { Sale } from './sale.model';
 import mongoose from 'mongoose';
+import { JwtPayload } from 'jsonwebtoken';
 
-const sellBikeFromDb = async (payload: TSaleBike) => {
+const sellBikeFromDb = async (user: JwtPayload, payload: TSaleBike) => {
   const { bikeId, quantity } = payload;
 
   const session = await mongoose.startSession();
@@ -28,8 +29,13 @@ const sellBikeFromDb = async (payload: TSaleBike) => {
         `Insufficient stock for the requested quantity! Our available stock is ${bike?.quantity}.`,
       );
     }
+    payload.sellerId = user._id as string;
 
-    // Sell the bike
+    payload.totalAmount = payload.quantity * bike.price;
+
+    // const newInvoiceId = await Invoice.create()
+
+    // payload.invoiceId =
     const sale = await Sale.create([payload], { session });
 
     // Update the bike quantity and sales

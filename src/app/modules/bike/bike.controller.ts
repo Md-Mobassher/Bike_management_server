@@ -70,12 +70,15 @@ const bulkDeleteBikes = catchAsync(async (req, res) => {
 const deleteBike = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await BikeServices.deleteBikeFromDB(id);
+  if (result?.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Delete Bikes');
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Bike is deleted succesfully',
-    data: result,
+    data: null,
   });
 });
 

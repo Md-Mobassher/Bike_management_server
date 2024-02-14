@@ -24,14 +24,12 @@ const registerUserIntoDB = async (file: any, payload: TUser) => {
   try {
     session.startTransaction();
 
-    const imageName = `${payload.name}`;
-    const path = file?.path;
-
-    if (path) {
+    if (file) {
+      const imageName = `${payload.name}`;
+      const path = file?.path;
       //send image to cloudinary
-      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
-      // set Image
-      payload.profileImg = secure_url;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = secure_url as string;
     }
 
     // create a User
@@ -84,12 +82,11 @@ const loginUser = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
   //create token and sent to the  client
-
   const jwtPayload = {
+    _id: user._id,
     email: user.email,
     role: user.role,
   };
-
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
@@ -127,20 +124,23 @@ const refreshToken = async (token: string) => {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
+  //create token and sent to the  client
   const jwtPayload = {
+    _id: user._id,
     email: user.email,
     role: user.role,
   };
-
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
     config.jwt_access_expires_in as string,
   );
 
-  return {
-    accessToken,
-  };
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
 };
 
 const forgetPassword = async (email: string) => {
@@ -158,6 +158,7 @@ const forgetPassword = async (email: string) => {
   }
 
   const jwtPayload = {
+    _id: user._id,
     email: user.email,
     role: user.role,
   };

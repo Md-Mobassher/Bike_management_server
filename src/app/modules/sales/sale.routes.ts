@@ -13,6 +13,7 @@ router.post(
   validateRequest(salesValidationSchema),
   SalesControllers.sellBike,
 );
+
 router.get('/history', auth(USER_ROLE.seller), SalesControllers.salesHistory);
 
 export const SalesRoutes = router;
