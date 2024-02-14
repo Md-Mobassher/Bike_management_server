@@ -31,11 +31,8 @@ const sellBikeFromDb = async (user: JwtPayload, payload: TSaleBike) => {
     }
     payload.sellerId = user._id as string;
 
-    payload.totalAmount = payload.quantity * bike.price;
+    payload.totalAmount = Number(payload.quantity * bike.price);
 
-    // const newInvoiceId = await Invoice.create()
-
-    // payload.invoiceId =
     const sale = await Sale.create([payload], { session });
 
     // Update the bike quantity and sales
@@ -57,11 +54,11 @@ const sellBikeFromDb = async (user: JwtPayload, payload: TSaleBike) => {
   }
 };
 
-const getSalesHistory = async (payload: string) => {
+const getSalesHistory = async (payload: any) => {
   try {
     let startDate: Date;
 
-    switch (payload) {
+    switch (payload?.interval) {
       case 'daily':
         startDate = new Date();
         startDate.setDate(startDate.getDate() - 1);
@@ -86,9 +83,19 @@ const getSalesHistory = async (payload: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
     }
 
-    const salesHistory = await Sale.find({
-      salesDate: { $gte: startDate },
-    }).sort('-salesDate');
+    const startDateUTC = new Date(startDate.toISOString());
+    const salesHistory = await Sale.aggregate([
+      {
+        $match: {
+          salesDate: {
+            $gte: new Date(startDateUTC),
+          },
+        },
+      },
+      {
+        $sort: { salesDate: -1 },
+      },
+    ]);
 
     return salesHistory;
   } catch (error) {

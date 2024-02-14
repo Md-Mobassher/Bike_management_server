@@ -16,8 +16,7 @@ const sellBike = catchAsync(async (req, res) => {
 });
 
 const salesHistory = catchAsync(async (req, res) => {
-  const { interval } = req.params;
-  const result = await SalesServices.getSalesHistory(interval);
+  const result = await SalesServices.getSalesHistory(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

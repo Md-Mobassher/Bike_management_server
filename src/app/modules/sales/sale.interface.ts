@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { Date, Types } from 'mongoose';
 
 export type TSaleBike = {
   sellerId: Types.ObjectId | string;
@@ -7,7 +7,7 @@ export type TSaleBike = {
   buyerName: string;
   salesDate: string;
   paymentMethod?: string;
-  isPaymentComplete: boolean;
+  isPaymentComplete?: boolean;
   totalAmount?: number;
   invoiceId?: Types.ObjectId;
 };

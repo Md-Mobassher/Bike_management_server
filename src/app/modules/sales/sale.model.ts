@@ -10,7 +10,6 @@ const saleBikeSchema = new Schema<TSaleBike>({
   paymentMethod: { type: String },
   isPaymentComplete: { type: Boolean, default: false },
   totalAmount: { type: Number, default: 0 },
-  invoiceId: { type: Schema.Types.ObjectId, ref: 'Invoice', required: true },
 });
 
 export const Sale = mongoose.model<TSaleBike>('Sale', saleBikeSchema);
