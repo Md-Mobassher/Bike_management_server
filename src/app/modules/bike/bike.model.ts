@@ -3,6 +3,7 @@ import { TBike } from './bike.interface';
 
 const bikeSchema = new Schema<TBike>(
   {
+    bikeId: { type: String, required: true },
     name: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
@@ -12,6 +13,9 @@ const bikeSchema = new Schema<TBike>(
     type: { type: String, required: true },
     size: { type: String, required: true },
     color: { type: String, required: true },
+    gearType: { type: String, required: true },
+    material: { type: String, required: true },
+    suspensionType: { type: String, required: true },
     bikeImage: { type: String, required: true },
     isDeleted: { type: Boolean, default: false, select: 0 },
   },

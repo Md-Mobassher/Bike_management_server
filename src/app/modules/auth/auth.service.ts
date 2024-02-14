@@ -89,7 +89,6 @@ const loginUser = async (payload: TLoginUser) => {
     email: user.email,
     role: user.role,
   };
-  console.log(jwtPayload);
 
   const accessToken = createToken(
     jwtPayload,
@@ -175,7 +174,7 @@ const forgetPassword = async (email: string) => {
 };
 
 const resetPassword = async (
-  payload: { id: string; newPassword: string },
+  payload: { email: string; newPassword: string },
   token: string,
 ) => {
   // checking if the user is exist
@@ -191,22 +190,13 @@ const resetPassword = async (
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
-  // checking if the user is blocked
-  const userStatus = user?.status;
-
-  if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
-  }
-
   const decoded = jwt.verify(
     token,
     config.jwt_access_secret as string,
   ) as JwtPayload;
 
-  //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
-
-  if (payload.id !== decoded.userId) {
-    console.log(payload.id, decoded.userId);
+  if (payload.email !== decoded.email) {
+    console.log(payload.email, decoded.email);
     throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden!');
   }
 

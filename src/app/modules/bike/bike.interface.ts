@@ -1,4 +1,5 @@
 export type TBike = {
+  bikeId: string;
   name: string;
   price: number;
   quantity: number;
@@ -8,6 +9,9 @@ export type TBike = {
   type: string;
   size: string;
   color: string;
+  gearType: string;
+  material: string;
+  suspensionType: string;
   bikeImage: string;
   isDeleted?: boolean;
 };

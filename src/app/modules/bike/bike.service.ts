@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { TBike } from './bike.interface';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { Bike } from './bike.model';
@@ -17,11 +17,12 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
     const imageName = `${payload.name}`;
     const path = file?.path;
 
-    //send image to cloudinary
-    const { secure_url }: any = await sendImageToCloudinary(imageName, path);
-
-    // set Image
-    payload.bikeImage = secure_url;
+    if (path) {
+      //send image to cloudinary
+      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
+      // set Image
+      payload.bikeImage = secure_url;
+    }
 
     // create a bike
     const newBike = await Bike.create([payload], { session });
@@ -76,6 +77,22 @@ const updateBikeIntoDB = async (id: string, payload: Partial<TBike>) => {
   return result;
 };
 
+const bulkDeleteBikesFromDB = async (payload: { bikeIds: string[] }) => {
+  const bikeIds = payload?.bikeIds.map((id) => new Types.ObjectId(id));
+
+  const result = await Bike.updateMany(
+    { _id: { $in: bikeIds } },
+    {
+      isDeleted: true,
+    },
+    {
+      runValidators: true,
+    },
+  );
+
+  return result;
+};
+
 const deleteBikeFromDB = async (id: string) => {
   await Bike.findByIdAndUpdate(
     id,
@@ -96,4 +113,5 @@ export const BikeServices = {
   getSingleBikeFromDB,
   updateBikeIntoDB,
   deleteBikeFromDB,
+  bulkDeleteBikesFromDB,
 };

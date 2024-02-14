@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { BikeServices } from './bike.service';
 import { RequestHandler } from 'express';
+import AppError from '../../errors/AppError';
 
 const addBike = catchAsync(async (req, res) => {
   const { ...bikeData } = req.body;
@@ -52,6 +53,20 @@ const updateBike = catchAsync(async (req, res) => {
   });
 });
 
+const bulkDeleteBikes = catchAsync(async (req, res) => {
+  const result = await BikeServices.bulkDeleteBikesFromDB(req.body);
+  if (!result.modifiedCount) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Delete Bikes');
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bikes are deleted succesfully',
+    data: null,
+  });
+});
+
 const deleteBike = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await BikeServices.deleteBikeFromDB(id);
@@ -70,4 +85,5 @@ export const BikeControllers = {
   getSingleBike,
   updateBike,
   deleteBike,
+  bulkDeleteBikes,
 };
