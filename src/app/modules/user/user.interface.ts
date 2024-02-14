@@ -12,7 +12,7 @@ export interface TUser {
   presentAddress: string;
   permanentAddress: string;
   profileImg?: string;
-  role: 'user' | 'admin';
+  role: 'buyer' | 'seller';
   isDeleted: boolean;
 }
 

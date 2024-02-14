@@ -44,8 +44,8 @@ const userSchema = new Schema<TUser, UserModel>(
     profileImg: { type: String },
     role: {
       type: String,
-      enum: ['user', 'admin'],
-      default: 'user',
+      enum: ['buyer', 'seller'],
+      required: true,
     },
     isDeleted: {
       type: Boolean,
