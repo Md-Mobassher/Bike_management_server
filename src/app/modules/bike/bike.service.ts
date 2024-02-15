@@ -21,6 +21,10 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
       const { secure_url }: any = await sendImageToCloudinary(imageName, path);
       payload.bikeImage = secure_url as string;
     }
+    const isBikeExists = await Bike.isBikeExists(payload.bikeId);
+    if (isBikeExists) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
+    }
 
     // create a bike
     const newBike = await Bike.create([payload], { session });
@@ -52,6 +56,11 @@ const duplicateBikeIntoDB = async (file: any, payload: TBike) => {
       //send image to cloudinary
       const { secure_url }: any = await sendImageToCloudinary(imageName, path);
       payload.bikeImage = secure_url as string;
+    }
+
+    const isBikeExists = await Bike.isBikeExists(payload.bikeId);
+    if (isBikeExists) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
     }
 
     // create a bike
