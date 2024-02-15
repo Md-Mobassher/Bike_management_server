@@ -17,6 +17,18 @@ const addBike = catchAsync(async (req, res) => {
   });
 });
 
+const duplicateBike = catchAsync(async (req, res) => {
+  const { ...bikeData } = req.body;
+  const result = await BikeServices.duplicateBikeIntoDB(req.file, bikeData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bike duplicated succesfully!',
+    data: result,
+  });
+});
+
 const getAllBikes: RequestHandler = catchAsync(async (req, res) => {
   const result = await BikeServices.getAllBikesFromDB(req.query);
 
@@ -84,6 +96,7 @@ const deleteBike = catchAsync(async (req, res) => {
 
 export const BikeControllers = {
   addBike,
+  duplicateBike,
   getAllBikes,
   getSingleBike,
   updateBike,

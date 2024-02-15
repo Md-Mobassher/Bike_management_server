@@ -28,7 +28,7 @@ const registerUserIntoDB = async (file: any, payload: TUser) => {
       const imageName = `${payload.name}`;
       const path = file?.path;
       //send image to cloudinary
-      const { secure_url } = await sendImageToCloudinary(imageName, path);
+      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
       payload.profileImg = secure_url as string;
     }
 
@@ -141,6 +141,11 @@ const refreshToken = async (token: string) => {
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 const forgetPassword = async (email: string) => {

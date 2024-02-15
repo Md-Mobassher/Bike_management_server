@@ -14,14 +14,12 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
   try {
     session.startTransaction();
 
-    const imageName = `${payload.name}`;
-    const path = file?.path;
-
-    if (path) {
+    if (file) {
+      const imageName = `${payload.name}`;
+      const path = file?.path;
       //send image to cloudinary
       const { secure_url }: any = await sendImageToCloudinary(imageName, path);
-      // set Image
-      payload.bikeImage = secure_url;
+      payload.bikeImage = secure_url as string;
     }
 
     // create a bike
@@ -29,6 +27,38 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
 
     if (!newBike.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to add Bike');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newBike;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+
+const duplicateBikeIntoDB = async (file: any, payload: TBike) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    if (file) {
+      const imageName = `${payload.name}`;
+      const path = file?.path;
+      //send image to cloudinary
+      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
+      payload.bikeImage = secure_url as string;
+    }
+
+    // create a bike
+    const newBike = await Bike.create([payload], { session });
+
+    if (!newBike.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Duplicate Bike');
     }
 
     await session.commitTransaction();
@@ -109,6 +139,7 @@ const deleteBikeFromDB = async (id: string) => {
 
 export const BikeServices = {
   addBikeIntoDB,
+  duplicateBikeIntoDB,
   getAllBikesFromDB,
   getSingleBikeFromDB,
   updateBikeIntoDB,

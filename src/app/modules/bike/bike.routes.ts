@@ -22,6 +22,20 @@ router.post(
   BikeControllers.addBike,
 );
 
+router.post(
+  '/duplicate/:id',
+  auth(USER_ROLE.seller),
+
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+
+  validateRequest(BikeVAlidation.createBikeValidationSchema),
+  BikeControllers.duplicateBike,
+);
+
 router.get(
   '/',
   auth(USER_ROLE.seller, USER_ROLE.buyer),
