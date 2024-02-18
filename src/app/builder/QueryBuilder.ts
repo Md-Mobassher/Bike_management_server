@@ -26,17 +26,67 @@ class QueryBuilder<T> {
   }
 
   filter() {
-    const queryObj = { ...this.query }; // copy
+    const queryObj: Record<string, unknown> = { ...this.query }; // copy
 
     // Filtering
     const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
     excludeFields.forEach((el) => delete queryObj[el]);
 
+    // Filter by Price
+    this.addPriceFilter(queryObj);
+
+    // Filter by Release Date
+    this.addReleaseDateFilter(queryObj);
+
+    // Filter by Brand
+    this.addBrandFilter(queryObj);
+
+    // Filter by Model
+    this.addModelFilter(queryObj);
+
+    // Add other filter parameters as needed
+
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 
     return this;
   }
+
+  private addPriceFilter(queryObj: Record<string, unknown>) {
+    const minPrice = Number(this?.query?.minPrice);
+    const maxPrice = Number(this?.query?.maxPrice);
+
+    if (!isNaN(minPrice) && !isNaN(maxPrice)) {
+      queryObj['price'] = {
+        $gte: minPrice,
+        $lte: maxPrice,
+      };
+    } else if (!isNaN(minPrice)) {
+      queryObj['price'] = { $gte: minPrice };
+    } else if (!isNaN(maxPrice)) {
+      queryObj['price'] = { $lte: maxPrice };
+    }
+  }
+
+  private addReleaseDateFilter(queryObj: Record<string, unknown>) {
+    if (this?.query?.releaseDate !== undefined) {
+      queryObj['releaseDate'] = this.query.releaseDate;
+    }
+  }
+
+  private addBrandFilter(queryObj: Record<string, unknown>) {
+    if (this.query.brand !== undefined) {
+      queryObj['brand'] = { $regex: this.query.brand, $options: 'i' };
+    }
+  }
+
+  private addModelFilter(queryObj: Record<string, unknown>) {
+    if (this.query.model !== undefined) {
+      queryObj['model'] = { $regex: this.query.model, $options: 'i' };
+    }
+  }
+
+  // Add methods for other filter parameters
 
   sort() {
     const sort =
@@ -48,7 +98,7 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 9;
+    const limit = Number(this?.query?.limit) || 10;
     const skip = (page - 1) * limit;
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
@@ -62,6 +112,21 @@ class QueryBuilder<T> {
 
     this.modelQuery = this.modelQuery.select(fields);
     return this;
+  }
+
+  async countTotal() {
+    const totalQueries = this.modelQuery.getFilter();
+    const total = await this.modelQuery.model.countDocuments(totalQueries);
+    const page = Number(this?.query?.page) || 1;
+    const limit = Number(this?.query?.limit) || 10;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+      page,
+      limit,
+      total,
+      totalPage,
+    };
   }
 }
 

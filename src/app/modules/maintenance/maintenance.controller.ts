@@ -20,7 +20,7 @@ const updateMaintenance = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Bike maintenance request succesfull!',
+    message: 'Bike maintenance update succesfull!',
     data: result,
   });
 });

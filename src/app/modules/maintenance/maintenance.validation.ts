@@ -16,8 +16,8 @@ const updateMaintenanceValidationSchema = z.object({
   notes: z.string().optional(),
   discount: z
     .object({
-      percentage: z.string().optional(),
-      fixedAmount: z.string().optional(),
+      percentage: z.number().optional(),
+      fixedAmount: z.number().optional(),
     })
     .optional(),
 });
