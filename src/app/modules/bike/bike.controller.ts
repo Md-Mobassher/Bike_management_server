@@ -19,7 +19,7 @@ const addBike = catchAsync(async (req, res) => {
 
 const duplicateBike = catchAsync(async (req, res) => {
   const { ...bikeData } = req.body;
-  const result = await BikeServices.duplicateBikeIntoDB(req.file, bikeData);
+  const result = await BikeServices.duplicateBikeIntoDB(bikeData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -15,7 +15,6 @@ router.post(
   upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
-
     next();
   },
 
@@ -27,11 +26,11 @@ router.post(
   '/duplicate/:id',
   auth(USER_ROLE.seller),
 
-  upload.single('file'),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = JSON.parse(req.body.data);
-    next();
-  },
+  // upload.single('file'),
+  // (req: Request, res: Response, next: NextFunction) => {
+  //   req.body = JSON.parse(req.body.data);
+  //   next();
+  // },
 
   validateRequest(BikeVAlidation.createBikeValidationSchema),
   BikeControllers.duplicateBike,

@@ -44,19 +44,11 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
   }
 };
 
-const duplicateBikeIntoDB = async (file: any, payload: TBike) => {
+const duplicateBikeIntoDB = async (payload: TBike) => {
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-
-    if (file) {
-      const imageName = `${payload.name}`;
-      const path = file?.path;
-      //send image to cloudinary
-      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
-      payload.bikeImage = secure_url as string;
-    }
 
     const isBikeExists = await Bike.isBikeExists(payload.bikeId);
     if (isBikeExists) {
