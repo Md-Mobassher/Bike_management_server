@@ -11,44 +11,69 @@
 ## User Registration:
 
 - Method: POST
-- LIve Link: https://bike-management-server.vercel.app/api/v1/users/register
+- LIve Link: https://bike-management-server.vercel.app/api/v1/auth/register
 
 ## User Login:
 
 - Method: POST
 - LIve Link: https://bike-management-server.vercel.app/api/v1/auth/login
 
-## Create a Bike (All registered user can do this):
+## Create a Bike (Seller):
 
 - Method: POST
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes
 
-## Get Paginated and Filtered Bike:
+## Duplicate a Bike (Seller):
+
+- Method: POST
+- LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/duplicate/:bikeId
+
+## Get Paginated and Filtered Bike: (Seller, Buyer)
 
 - Method: GET
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes
 
-## Get single bike:
+## Get single bike: (Seller, Buyer)
 
 - Method: GET
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/:bikeId
 
-## Update a Bike:
+## Update a Bike: (Seller)
 
 - Method: PATCH
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/:bikeId
 
-## Delete a Bike:
+## Delete a Bike: (Seller)
 
-- Method: PUT
+- Method: DELETE
 - LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/:bikeId
 
-## Sell a bike:
+## Bulk-Delete Bikes: (Seller)
+
+- Method: DELETE
+- LIve Link: https://bike-management-server.vercel.app/api/v1/bikes/bulk-delete
+
+## Sell a bike: ( Seller )
 
 - Method: POST
-- LIve Link: https://bike-management-server.vercel.app/api/v1/sell
+- LIve Link: https://bike-management-server.vercel.app/api/v1/sales
 
-## Get Sales history:
+## Get Sales history: ( Seller )
 
 - Method: GET
-- LIve Link: https://bike-management-server.vercel.app/api/v1/sales-history/:interval
+- LIve Link: https://bike-management-server.vercel.app/api/v1/sales/history?interval=daily
+
+## Request Maintenance: ( Buyer )
+
+- Method: POST
+- LIve Link: https://bike-management-server.vercel.app/api/v1/maintenance
+
+## Update Maintenance: ( Seller )
+
+- Method: GET
+- LIve Link: https://bike-management-server.vercel.app/api/v1/maintenance
+
+## Get Invoice: ( Seller , Buyer )
+
+- Method: GET
+- LIve Link: https://bike-management-server.vercel.app/api/v1/invoice/:salesId

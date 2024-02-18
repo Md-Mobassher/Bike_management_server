@@ -56,7 +56,7 @@ const sellBikeFromDb = async (user: JwtPayload, payload: TSaleBike) => {
 
 const getSalesHistory = async (payload: any) => {
   try {
-    let startDate: Date;
+    let startDate;
 
     switch (payload?.interval) {
       case 'daily':
@@ -83,12 +83,11 @@ const getSalesHistory = async (payload: any) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
     }
 
-    const startDateUTC = new Date(startDate.toISOString());
     const salesHistory = await Sale.aggregate([
       {
         $match: {
           salesDate: {
-            $gte: new Date(startDateUTC),
+            $gte: startDate.toISOString().split('T')[0],
           },
         },
       },
