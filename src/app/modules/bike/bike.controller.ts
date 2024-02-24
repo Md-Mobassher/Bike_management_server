@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { BikeServices } from './bike.service';
-import { RequestHandler } from 'express';
+
 import AppError from '../../errors/AppError';
 
 const addBike = catchAsync(async (req, res) => {
@@ -29,7 +29,7 @@ const duplicateBike = catchAsync(async (req, res) => {
   });
 });
 
-const getAllBikes: RequestHandler = catchAsync(async (req, res) => {
+const getAllBikes = catchAsync(async (req, res) => {
   const result = await BikeServices.getAllBikesFromDB(req.query);
 
   sendResponse(res, {

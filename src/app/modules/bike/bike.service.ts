@@ -74,7 +74,18 @@ const duplicateBikeIntoDB = async (payload: TBike) => {
 };
 
 const getAllBikesFromDB = async (query: Record<string, unknown>) => {
-  const bikeQuery = new QueryBuilder(Bike.find(), query)
+  const minPrice = query.minPrice
+    ? parseFloat(query.minPrice as string)
+    : undefined;
+  const maxPrice = query.maxPrice
+    ? parseFloat(query.maxPrice as string)
+    : undefined;
+
+  const bikeQuery = new QueryBuilder(Bike.find(), {
+    ...query,
+    minPrice,
+    maxPrice,
+  })
     .search(bikeSearchableFields)
     .filter()
     .sort()

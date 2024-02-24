@@ -14,6 +14,7 @@ const updateMaintenanceValidationSchema = z.object({
   nextServicingDate: z.string().optional(),
   serviceDetails: z.array(z.string()).optional(),
   notes: z.string().optional(),
+  isPending: z.boolean().optional(),
   discount: z
     .object({
       percentage: z.number().optional(),

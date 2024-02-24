@@ -7,6 +7,13 @@ import { MaintenanceVAlidation } from './maintenance.validation';
 
 const router = express.Router();
 
+router.get(
+  '/',
+  auth(USER_ROLE.seller),
+
+  MaintenanceControllers.getAllMaintenance,
+);
+
 router.post(
   '/',
   auth(USER_ROLE.buyer),

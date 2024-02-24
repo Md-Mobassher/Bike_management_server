@@ -32,6 +32,8 @@ class QueryBuilder<T> {
     const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
     excludeFields.forEach((el) => delete queryObj[el]);
+    // Filter By Id
+    this.addIdFilter(queryObj);
 
     // Filter by Price
     this.addPriceFilter(queryObj);
@@ -45,26 +47,43 @@ class QueryBuilder<T> {
     // Filter by Model
     this.addModelFilter(queryObj);
 
-    // Add other filter parameters as needed
+    // Filter by color
+    this.addColorFilter(queryObj);
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 
     return this;
   }
 
-  private addPriceFilter(queryObj: Record<string, unknown>) {
-    const minPrice = Number(this?.query?.minPrice);
-    const maxPrice = Number(this?.query?.maxPrice);
+  private addIdFilter(queryObj: Record<string, unknown>) {
+    if (this?.query?.bikeId !== undefined) {
+      queryObj['bikeId'] = this.query.bikeId;
+    }
+  }
 
-    if (!isNaN(minPrice) && !isNaN(maxPrice)) {
-      queryObj['price'] = {
-        $gte: minPrice,
-        $lte: maxPrice,
-      };
-    } else if (!isNaN(minPrice)) {
-      queryObj['price'] = { $gte: minPrice };
-    } else if (!isNaN(maxPrice)) {
-      queryObj['price'] = { $lte: maxPrice };
+  private addPriceFilter(queryObj: Record<string, unknown>) {
+    const minPrice = this?.query?.minPrice;
+    const maxPrice = this?.query?.maxPrice;
+
+    if (
+      minPrice !== undefined &&
+      maxPrice !== undefined &&
+      minPrice !== '' &&
+      maxPrice !== ''
+    ) {
+      const numericMinPrice = Number(minPrice);
+      const numericMaxPrice = Number(maxPrice);
+
+      if (!isNaN(numericMinPrice) && !isNaN(numericMaxPrice)) {
+        queryObj['price'] = {
+          $gte: numericMinPrice,
+          $lte: numericMaxPrice,
+        };
+      } else if (!isNaN(numericMinPrice)) {
+        queryObj['price'] = { $gte: numericMinPrice };
+      } else if (!isNaN(numericMaxPrice)) {
+        queryObj['price'] = { $lte: numericMaxPrice };
+      }
     }
   }
 
@@ -83,6 +102,12 @@ class QueryBuilder<T> {
   private addModelFilter(queryObj: Record<string, unknown>) {
     if (this.query.model !== undefined) {
       queryObj['model'] = { $regex: this.query.model, $options: 'i' };
+    }
+  }
+
+  private addColorFilter(queryObj: Record<string, unknown>) {
+    if (this.query.color !== undefined) {
+      queryObj['color'] = { $regex: this.query.color, $options: 'i' };
     }
   }
 
