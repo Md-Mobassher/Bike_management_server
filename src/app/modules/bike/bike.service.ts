@@ -13,6 +13,9 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
 
   try {
     session.startTransaction();
+    if (!file) {
+      payload.bikeImage = '';
+    }
 
     if (file) {
       const imageName = `${payload.name}`;
