@@ -14,6 +14,20 @@ const getAllMaintenance = catchAsync(async (req, res) => {
   });
 });
 
+const getMyRequestedMaintenance = catchAsync(async (req, res) => {
+  const result = await MaintenanceServices.getMyRequestedMaintenanceFromDB(
+    req.query,
+    req.user,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bike maintenance retrieved succesfull!',
+    data: result,
+  });
+});
+
 const requestMaintenance = catchAsync(async (req, res) => {
   const result = await MaintenanceServices.requestMaintenanceFromDB(
     req.user,
@@ -41,6 +55,7 @@ const updateMaintenance = catchAsync(async (req, res) => {
 
 export const MaintenanceControllers = {
   getAllMaintenance,
+  getMyRequestedMaintenance,
   requestMaintenance,
   updateMaintenance,
 };

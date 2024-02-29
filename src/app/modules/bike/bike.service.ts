@@ -9,13 +9,15 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { bikeSearchableFields } from './bike.constant';
 
 const addBikeIntoDB = async (file: any, payload: TBike) => {
+  const isBikeExists = await Bike.isBikeExists(payload.bikeId);
+  if (isBikeExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
+  }
+
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-    if (!file) {
-      payload.bikeImage = '';
-    }
 
     if (file) {
       const imageName = `${payload.name}`;
@@ -23,10 +25,6 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
       //send image to cloudinary
       const { secure_url }: any = await sendImageToCloudinary(imageName, path);
       payload.bikeImage = secure_url as string;
-    }
-    const isBikeExists = await Bike.isBikeExists(payload.bikeId);
-    if (isBikeExists) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
     }
 
     // create a bike

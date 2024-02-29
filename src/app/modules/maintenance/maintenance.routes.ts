@@ -13,6 +13,12 @@ router.get(
 
   MaintenanceControllers.getAllMaintenance,
 );
+router.get(
+  '/me',
+  auth(USER_ROLE.buyer),
+
+  MaintenanceControllers.getMyRequestedMaintenance,
+);
 
 router.post(
   '/',

@@ -20,6 +20,25 @@ const getAllMaintenanceFromDB = async (query: Record<string, unknown>) => {
 
   return result;
 };
+const getMyRequestedMaintenanceFromDB = async (
+  query: Record<string, unknown>,
+  user: JwtPayload,
+) => {
+  const maintenanceQuery = new QueryBuilder(
+    Maintenance.find({ buyerId: user._id })
+      .populate('bikeId')
+      .populate('buyerId'),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await maintenanceQuery.modelQuery;
+
+  return result;
+};
 
 const requestMaintenanceFromDB = async (
   user: JwtPayload,
@@ -69,6 +88,7 @@ const updateMaintenanceFromDB = async (payload: TMaintenance) => {
 
 export const MaintenanceServices = {
   getAllMaintenanceFromDB,
+  getMyRequestedMaintenanceFromDB,
   requestMaintenanceFromDB,
   updateMaintenanceFromDB,
 };

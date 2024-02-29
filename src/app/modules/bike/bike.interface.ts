@@ -15,7 +15,7 @@ export type TBike = {
   gearType: string;
   material: string;
   suspensionType: string;
-  bikeImage: string;
+  bikeImage?: string;
   isDeleted?: boolean;
 };
 

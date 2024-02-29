@@ -16,7 +16,11 @@ const bikeSchema = new Schema<TBike, BikeModel>(
     gearType: { type: String, required: true },
     material: { type: String, required: true },
     suspensionType: { type: String, required: true },
-    bikeImage: { type: String, default: '' },
+    bikeImage: {
+      type: String,
+      default:
+        'https://res.cloudinary.com/dhajseyww/image/upload/v1708758501/Pulser.webp',
+    },
     isDeleted: { type: Boolean, default: false, select: 0 },
   },
   {
