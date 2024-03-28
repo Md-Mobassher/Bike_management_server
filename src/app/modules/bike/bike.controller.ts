@@ -2,7 +2,8 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { BikeServices } from './bike.service';
-import { RequestHandler } from 'express';
+
+import AppError from '../../errors/AppError';
 
 const addBike = catchAsync(async (req, res) => {
   const { ...bikeData } = req.body;
@@ -16,7 +17,19 @@ const addBike = catchAsync(async (req, res) => {
   });
 });
 
-const getAllBikes: RequestHandler = catchAsync(async (req, res) => {
+const duplicateBike = catchAsync(async (req, res) => {
+  const { ...bikeData } = req.body;
+  const result = await BikeServices.duplicateBikeIntoDB(bikeData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bike duplicated succesfully!',
+    data: result,
+  });
+});
+
+const getAllBikes = catchAsync(async (req, res) => {
   const result = await BikeServices.getAllBikesFromDB(req.query);
 
   sendResponse(res, {
@@ -52,22 +65,41 @@ const updateBike = catchAsync(async (req, res) => {
   });
 });
 
+const bulkDeleteBikes = catchAsync(async (req, res) => {
+  const result = await BikeServices.bulkDeleteBikesFromDB(req.body);
+  if (!result.modifiedCount) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Delete Bikes');
+  }
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bikes are deleted succesfully',
+    data: null,
+  });
+});
+
 const deleteBike = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await BikeServices.deleteBikeFromDB(id);
+  if (result?.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Delete Bikes');
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Bike is deleted succesfully',
-    data: result,
+    data: null,
   });
 });
 
 export const BikeControllers = {
   addBike,
+  duplicateBike,
   getAllBikes,
   getSingleBike,
   updateBike,
   deleteBike,
+  bulkDeleteBikes,
 };

@@ -26,17 +26,92 @@ class QueryBuilder<T> {
   }
 
   filter() {
-    const queryObj = { ...this.query }; // copy
+    const queryObj: Record<string, unknown> = { ...this.query }; // copy
 
     // Filtering
     const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
     excludeFields.forEach((el) => delete queryObj[el]);
+    // Filter By Id
+    this.addIdFilter(queryObj);
+
+    // Filter by Price
+    this.addPriceFilter(queryObj);
+
+    // Filter by Release Date
+    this.addReleaseDateFilter(queryObj);
+
+    // Filter by Brand
+    this.addBrandFilter(queryObj);
+
+    // Filter by Model
+    this.addModelFilter(queryObj);
+
+    // Filter by color
+    this.addColorFilter(queryObj);
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 
     return this;
   }
+
+  private addIdFilter(queryObj: Record<string, unknown>) {
+    if (this?.query?.bikeId !== undefined) {
+      queryObj['bikeId'] = this.query.bikeId;
+    }
+  }
+
+  private addPriceFilter(queryObj: Record<string, unknown>) {
+    const minPrice = this?.query?.minPrice;
+    const maxPrice = this?.query?.maxPrice;
+
+    if (
+      minPrice !== undefined &&
+      maxPrice !== undefined &&
+      minPrice !== '' &&
+      maxPrice !== ''
+    ) {
+      const numericMinPrice = Number(minPrice);
+      const numericMaxPrice = Number(maxPrice);
+
+      if (!isNaN(numericMinPrice) && !isNaN(numericMaxPrice)) {
+        queryObj['price'] = {
+          $gte: numericMinPrice,
+          $lte: numericMaxPrice,
+        };
+      } else if (!isNaN(numericMinPrice)) {
+        queryObj['price'] = { $gte: numericMinPrice };
+      } else if (!isNaN(numericMaxPrice)) {
+        queryObj['price'] = { $lte: numericMaxPrice };
+      }
+    }
+  }
+
+  private addReleaseDateFilter(queryObj: Record<string, unknown>) {
+    if (this?.query?.releaseDate !== undefined) {
+      queryObj['releaseDate'] = this.query.releaseDate;
+    }
+  }
+
+  private addBrandFilter(queryObj: Record<string, unknown>) {
+    if (this.query.brand !== undefined) {
+      queryObj['brand'] = { $regex: this.query.brand, $options: 'i' };
+    }
+  }
+
+  private addModelFilter(queryObj: Record<string, unknown>) {
+    if (this.query.model !== undefined) {
+      queryObj['model'] = { $regex: this.query.model, $options: 'i' };
+    }
+  }
+
+  private addColorFilter(queryObj: Record<string, unknown>) {
+    if (this.query.color !== undefined) {
+      queryObj['color'] = { $regex: this.query.color, $options: 'i' };
+    }
+  }
+
+  // Add methods for other filter parameters
 
   sort() {
     const sort =
@@ -48,7 +123,7 @@ class QueryBuilder<T> {
 
   paginate() {
     const page = Number(this?.query?.page) || 1;
-    const limit = Number(this?.query?.limit) || 9;
+    const limit = Number(this?.query?.limit) || 10;
     const skip = (page - 1) * limit;
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);
@@ -62,6 +137,21 @@ class QueryBuilder<T> {
 
     this.modelQuery = this.modelQuery.select(fields);
     return this;
+  }
+
+  async countTotal() {
+    const totalQueries = this.modelQuery.getFilter();
+    const total = await this.modelQuery.model.countDocuments(totalQueries);
+    const page = Number(this?.query?.page) || 1;
+    const limit = Number(this?.query?.limit) || 9;
+    const totalPage = Math.ceil(total / limit);
+
+    return {
+      page,
+      limit,
+      total,
+      totalPage,
+    };
   }
 }
 

@@ -1,4 +1,8 @@
+/* eslint-disable no-unused-vars */
+import { Model } from 'mongoose';
+
 export type TBike = {
+  bikeId: string;
   name: string;
   price: number;
   quantity: number;
@@ -8,6 +12,14 @@ export type TBike = {
   type: string;
   size: string;
   color: string;
-  bikeImage: string;
+  gearType: string;
+  material: string;
+  suspensionType: string;
+  bikeImage?: string;
   isDeleted?: boolean;
 };
+
+export interface BikeModel extends Model<TBike> {
+  // instance method for checking if the bike exists or not
+  isBikeExists(bikeId: string): Promise<TBike | null>;
+}

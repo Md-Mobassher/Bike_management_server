@@ -11,6 +11,7 @@ const createUserValidationSchema = z.object({
   contactNo: z.string(),
   gender: z.enum(['male', 'female', 'other']),
   dateOfBirth: z.string(),
+  role: z.enum(['buyer', 'seller']),
   presentAddress: z.string(),
   permanentAddress: z.string(),
 });

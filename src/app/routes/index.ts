@@ -1,16 +1,13 @@
 import { Router } from 'express';
-import { UserRoutes } from '../modules/user/user.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { BikeRoutes } from '../modules/bike/bike.routes';
 import { SalesRoutes } from '../modules/sales/sale.routes';
+import { InvoiceRoutes } from '../modules/invoice/invoice.routes';
+import { MaintainanceRoutes } from '../modules/maintenance/maintenance.routes';
 
 const router = Router();
 
 const moduleRoutes = [
-  {
-    path: '/users',
-    route: UserRoutes,
-  },
   {
     path: '/auth',
     route: AuthRoutes,
@@ -20,12 +17,16 @@ const moduleRoutes = [
     route: BikeRoutes,
   },
   {
-    path: '/sell',
+    path: '/sales',
     route: SalesRoutes,
   },
   {
-    path: '/sales-history',
-    route: SalesRoutes,
+    path: '/invoice',
+    route: InvoiceRoutes,
+  },
+  {
+    path: '/maintenance',
+    route: MaintainanceRoutes,
   },
 ];
 

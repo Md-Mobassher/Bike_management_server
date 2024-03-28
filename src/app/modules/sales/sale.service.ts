@@ -5,8 +5,9 @@ import { TSaleBike } from './sale.interface';
 import { Bike } from '../bike/bike.model';
 import { Sale } from './sale.model';
 import mongoose from 'mongoose';
+import { JwtPayload } from 'jsonwebtoken';
 
-const sellBikeFromDb = async (payload: TSaleBike) => {
+const sellBikeFromDb = async (user: JwtPayload, payload: TSaleBike) => {
   const { bikeId, quantity } = payload;
 
   const session = await mongoose.startSession();
@@ -28,8 +29,10 @@ const sellBikeFromDb = async (payload: TSaleBike) => {
         `Insufficient stock for the requested quantity! Our available stock is ${bike?.quantity}.`,
       );
     }
+    payload.sellerId = user._id as string;
 
-    // Sell the bike
+    payload.totalAmount = Number(payload.quantity * bike.price);
+
     const sale = await Sale.create([payload], { session });
 
     // Update the bike quantity and sales
@@ -51,11 +54,11 @@ const sellBikeFromDb = async (payload: TSaleBike) => {
   }
 };
 
-const getSalesHistory = async (payload: string) => {
+const getSalesHistory = async (payload: any) => {
   try {
-    let startDate: Date;
+    let startDate;
 
-    switch (payload) {
+    switch (payload?.interval) {
       case 'daily':
         startDate = new Date();
         startDate.setDate(startDate.getDate() - 1);
@@ -80,9 +83,18 @@ const getSalesHistory = async (payload: string) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Invalid interval');
     }
 
-    const salesHistory = await Sale.find({
-      salesDate: { $gte: startDate },
-    }).sort('-salesDate');
+    const salesHistory = await Sale.aggregate([
+      {
+        $match: {
+          salesDate: {
+            $gte: startDate.toISOString().split('T')[0],
+          },
+        },
+      },
+      {
+        $sort: { salesDate: -1 },
+      },
+    ]);
 
     return salesHistory;
   } catch (error) {

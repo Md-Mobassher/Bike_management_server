@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { TBike } from './bike.interface';
 import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 import { Bike } from './bike.model';
@@ -9,19 +9,23 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { bikeSearchableFields } from './bike.constant';
 
 const addBikeIntoDB = async (file: any, payload: TBike) => {
+  const isBikeExists = await Bike.isBikeExists(payload.bikeId);
+  if (isBikeExists) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
+  }
+
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
 
-    const imageName = `${payload.name}`;
-    const path = file?.path;
-
-    //send image to cloudinary
-    const { secure_url }: any = await sendImageToCloudinary(imageName, path);
-
-    // set Image
-    payload.bikeImage = secure_url;
+    if (file) {
+      const imageName = `${payload.name}`;
+      const path = file?.path;
+      //send image to cloudinary
+      const { secure_url }: any = await sendImageToCloudinary(imageName, path);
+      payload.bikeImage = secure_url as string;
+    }
 
     // create a bike
     const newBike = await Bike.create([payload], { session });
@@ -41,8 +45,48 @@ const addBikeIntoDB = async (file: any, payload: TBike) => {
   }
 };
 
+const duplicateBikeIntoDB = async (payload: TBike) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const isBikeExists = await Bike.isBikeExists(payload.bikeId);
+    if (isBikeExists) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Bike Already Exists!');
+    }
+
+    // create a bike
+    const newBike = await Bike.create([payload], { session });
+
+    if (!newBike.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to Duplicate Bike');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newBike;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
+  }
+};
+
 const getAllBikesFromDB = async (query: Record<string, unknown>) => {
-  const bikeQuery = new QueryBuilder(Bike.find(), query)
+  const minPrice = query.minPrice
+    ? parseFloat(query.minPrice as string)
+    : undefined;
+  const maxPrice = query.maxPrice
+    ? parseFloat(query.maxPrice as string)
+    : undefined;
+
+  const bikeQuery = new QueryBuilder(Bike.find(), {
+    ...query,
+    minPrice,
+    maxPrice,
+  })
     .search(bikeSearchableFields)
     .filter()
     .sort()
@@ -76,8 +120,24 @@ const updateBikeIntoDB = async (id: string, payload: Partial<TBike>) => {
   return result;
 };
 
+const bulkDeleteBikesFromDB = async (payload: { bikeIds: string[] }) => {
+  const bikeIds = payload?.bikeIds.map((id) => new Types.ObjectId(id));
+
+  const result = await Bike.updateMany(
+    { _id: { $in: bikeIds } },
+    {
+      isDeleted: true,
+    },
+    {
+      runValidators: true,
+    },
+  );
+
+  return result;
+};
+
 const deleteBikeFromDB = async (id: string) => {
-  await Bike.findByIdAndUpdate(
+  const result = await Bike.findByIdAndUpdate(
     id,
     {
       isDeleted: true,
@@ -87,13 +147,15 @@ const deleteBikeFromDB = async (id: string) => {
       runValidators: true,
     },
   );
-  return null;
+  return result;
 };
 
 export const BikeServices = {
   addBikeIntoDB,
+  duplicateBikeIntoDB,
   getAllBikesFromDB,
   getSingleBikeFromDB,
   updateBikeIntoDB,
   deleteBikeFromDB,
+  bulkDeleteBikesFromDB,
 };
