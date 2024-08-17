@@ -7,6 +7,7 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { bikeSearchableFields } from './bike.constant';
+import { Sale } from '../sales/sale.model';
 
 const addBikeIntoDB = async (file: any, payload: TBike) => {
   const isBikeExists = await Bike.isBikeExists(payload.bikeId);
@@ -150,6 +151,34 @@ const deleteBikeFromDB = async (id: string) => {
   return result;
 };
 
+const bikeAnalytics = async () => {
+  const totalBikes = await Bike.aggregate([
+    { $match: { isDeleted: false } },
+    { $group: { _id: null, total: { $sum: '$quantity' } } },
+  ]).then((res) => (res[0] ? res[0].total : 0));
+
+  const totalSalesResult = await Sale.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalSales: { $sum: '$quantity' },
+      },
+    },
+  ]);
+
+  const totalSales =
+    totalSalesResult.length > 0 ? totalSalesResult[0].totalSales : 0;
+
+  // Calculate the total available for sale by subtracting the total sales from the total bikes
+  const totalAvailableForSale = totalBikes - totalSales;
+
+  return {
+    totalBikes,
+    totalSales,
+    totalAvailableForSale,
+  };
+};
+
 export const BikeServices = {
   addBikeIntoDB,
   duplicateBikeIntoDB,
@@ -158,4 +187,5 @@ export const BikeServices = {
   updateBikeIntoDB,
   deleteBikeFromDB,
   bulkDeleteBikesFromDB,
+  bikeAnalytics,
 };

@@ -94,6 +94,17 @@ const deleteBike = catchAsync(async (req, res) => {
   });
 });
 
+const bikeAnalytics = catchAsync(async (req, res) => {
+  const result = await BikeServices.bikeAnalytics();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bike analytics retrived succesfully',
+    data: result,
+  });
+});
+
 export const BikeControllers = {
   addBike,
   duplicateBike,
@@ -102,4 +113,5 @@ export const BikeControllers = {
   updateBike,
   deleteBike,
   bulkDeleteBikes,
+  bikeAnalytics,
 };

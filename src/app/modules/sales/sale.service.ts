@@ -102,7 +102,13 @@ const getSalesHistory = async (payload: any) => {
   }
 };
 
+const getSalesAnalytics = async () => {
+  const totalSales = await Sale.find();
+  return totalSales;
+};
+
 export const SalesServices = {
   sellBikeFromDb,
   getSalesHistory,
+  getSalesAnalytics,
 };
