@@ -53,9 +53,21 @@ const updateMaintenance = catchAsync(async (req, res) => {
   });
 });
 
+const getMaintenanceStatistics = catchAsync(async (req, res) => {
+  const result = await MaintenanceServices.getMaintenanceStatistics();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Bike Maintenance statistics retrieved succesfull!',
+    data: result,
+  });
+});
+
 export const MaintenanceControllers = {
   getAllMaintenance,
   getMyRequestedMaintenance,
   requestMaintenance,
   updateMaintenance,
+  getMaintenanceStatistics,
 };

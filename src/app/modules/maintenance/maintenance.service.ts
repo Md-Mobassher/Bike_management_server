@@ -86,9 +86,23 @@ const updateMaintenanceFromDB = async (payload: TMaintenance) => {
   return result;
 };
 
+const getMaintenanceStatistics = async () => {
+  const totalRequests = await Maintenance.countDocuments();
+  const totalAccepted = await Maintenance.countDocuments({
+    isPending: false,
+  });
+  const totalPending = await Maintenance.countDocuments({ isPending: true });
+
+  return {
+    totalRequests,
+    totalAccepted,
+    totalPending,
+  };
+};
 export const MaintenanceServices = {
   getAllMaintenanceFromDB,
   getMyRequestedMaintenanceFromDB,
   requestMaintenanceFromDB,
   updateMaintenanceFromDB,
+  getMaintenanceStatistics,
 };

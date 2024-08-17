@@ -14,6 +14,12 @@ router.get(
   MaintenanceControllers.getAllMaintenance,
 );
 router.get(
+  '/analytics',
+  auth(USER_ROLE.seller),
+
+  MaintenanceControllers.getMaintenanceStatistics,
+);
+router.get(
   '/me',
   auth(USER_ROLE.buyer),
 
